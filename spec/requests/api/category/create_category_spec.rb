@@ -1,39 +1,39 @@
 require 'rails_helper'
 
 describe 'POST create category' do
-	let!(:category) { FactoryGirl.create(:category, name: 'some') }
-	let(:params) do 
+	let(:params) do
 		{
 			category: {
-				name: 'some name'
+				name: 'some'
 			}
 		} 
-	end
+  end
 
 	before do
 		post '/api/categories', params, { :format => 'json' }
 	end
 
 	context 'when it create success' do
+
 		it 'should return status 201' do
 			expect(response.status).to eq 201
 		end
 
 		it 'should return a success message' do
 			expect(json_body['message']).to eq 'success'
-		end
+    end
+
+    it 'should change the category column count by 1' do
+      expect{
+				post '/api/categories', { category: { name: 123 } }, { :format => 'json' }
+      }.to change{ Category.count }.by(1)
+    end
 	end
 
 	context 'when it already have exist the create category name' do
-		let(:params) do 
-			{
-				category: {
-					name: 'some'
-				}
-			} 
-		end
-
 		before do
+			FactoryGirl.create(:category, name: 'some')
+
 			post '/api/categories', params, { :format => 'json' }
 		end
 
